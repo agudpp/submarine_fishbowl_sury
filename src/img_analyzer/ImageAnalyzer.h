@@ -11,7 +11,8 @@
 
 #include <string>
 
-
+#include <img_reader/ImgCapturedData.h>
+#include <common/math/Vector2.h>
 
 namespace img {
 
@@ -35,6 +36,25 @@ public:
         std::string configFilePath;
     };
 
+    // The resulting data obtaindes by this class.
+    struct ResultData {
+        // for now it will be the bounding box and the 4 vertices in the image
+        // representing the corners of the fishbowl (we can always return the same
+        // positions and assume that the camera will not be moved, for simplicity)
+        //
+
+        // submarine info
+        Vec2I submPos;  // the center position of the bounding box
+        Vec2I submSize; // the size of the bounding box (width / height)
+        // float submRotation; // probably we can track rotation, not for now
+
+        // fishbowl info (4 corners)
+        Vec2I topLeft;
+        Vec2I topRight;
+        Vec2I bottomLeft;
+        Vec2I bottomRight;
+    };
+
 public:
     ImageAnalyzer();
     ~ImageAnalyzer();
@@ -54,6 +74,17 @@ public:
     void
     uninit(void);
 
+    // @brief This is the main method that should process (analyze) the image
+    //        and extract the information we need from the frame.
+    //        For this particular project we will only extract the bounding box
+    //        information of the submarine. This should contain the position
+    //        and size of the bounding box.
+    // @param capturedData      The captured data we will process.
+    // @param result            The resulting processed data
+    // @return true on success | false otherwise
+    //
+    bool
+    process(ImgCapturedData& capturedData, ResultData& result);
 
 };
 

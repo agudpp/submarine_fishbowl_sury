@@ -3,6 +3,7 @@ Need
 - CMake.
 - g++ 4.7.X
 - OpenCV 3.0 (alpha), -> download and compile the lib and install it.
-- SFML 2.1 (http://sfml-dev.org/download/sfml/2.1/)
+- SFML 2.1 (http://sfml-dev.org/download/sfml/2.1/), for this one you will
+  need probably glew 1.7 (install directly the binary from .deb package)
 - Eclipse
 
