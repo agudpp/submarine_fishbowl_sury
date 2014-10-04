@@ -27,7 +27,7 @@ AnimHandler::parseAnimFromFile(const std::string& fileName,
 {
     // open the file. Read the content and parse line by line
     std::ifstream file(fileName.c_str(), std::ios::binary);
-    if (!file.is_good()) {
+    if (!file.good()) {
         debugERROR("Couldn't open the file %s\n", fileName.c_str());
         return false;
     }
@@ -77,7 +77,7 @@ AnimHandler::AnimHandler() :
 ,   m_currentAnim(0)
 ,   m_loopAnim(false)
 ,   m_currentTime(0.f)
-,   m_currentFrameIndex(-1s)
+,   m_currentFrameIndex(-1)
 {
 
 }
@@ -158,7 +158,7 @@ AnimHandler::update(float timeFrame)
     }
 
     // calculate the current index
-    const int index = m_currentAnim / animTime;
+    const int index = m_currentTime / animTime;
     if (index == m_currentFrameIndex) {
         // nothing to do
         return;

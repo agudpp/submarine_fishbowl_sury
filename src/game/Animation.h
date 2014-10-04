@@ -77,7 +77,7 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 // Inline
 
-inline Animation::Animation(const std::string& name = "") :
+inline Animation::Animation(const std::string& name) :
     m_name(name)
 ,   m_time(-1.f)
 {}
