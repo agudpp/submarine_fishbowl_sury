@@ -63,7 +63,7 @@ public:
     // @brief Check if an animation exists
     //
     inline bool
-    animExists(const std::string& anim);
+    animExists(const std::string& anim) const;
 
     // @brief Set loop animation
     //
@@ -74,6 +74,23 @@ public:
     //
     void
     restartAnimation(void);
+
+    // @brief Check if the current animation ended
+    //
+    inline bool
+    currentAnimEnded(void) const;
+
+    // @brief Current animation | 0 if no anim
+    //
+    inline const Animation*
+    currentAnim(void) const;
+
+    // @brief Return the references of the current animations (note that this
+    //        will change if we modify the handler so the references could be
+    //        invalidated
+    //
+    inline void
+    getAnimations(std::vector<const Animation*>& animations) const;
 
     // @brief Main method where we will update the logic of the animation.
     // @param timeFrame     The frame time
@@ -105,7 +122,7 @@ private:
 
 
 inline bool
-AnimHandler::animExists(const std::string& anim)
+AnimHandler::animExists(const std::string& anim) const
 {
     auto animIt = m_animations.find(anim);
     return animIt != m_animations.end();
@@ -116,6 +133,29 @@ AnimHandler::setAnimLoop(bool loop)
     m_loopAnim = loop;
 }
 
+inline bool
+AnimHandler::currentAnimEnded(void) const
+{
+    return m_currentAnim != 0 &&
+           m_currentAnim->time() >= m_currentTime &&
+           !m_loopAnim;
+}
+
+inline const Animation*
+AnimHandler::currentAnim(void) const
+{
+    return m_currentAnim;
+}
+
+inline void
+AnimHandler::getAnimations(std::vector<const Animation*>& animations) const
+{
+    animations.clear();
+    animations.reserve(m_animations.size());
+    for (auto elem : m_animations) {
+        animations.push_back(&elem.second);
+    }
+}
 
 } /* namespace game */
 

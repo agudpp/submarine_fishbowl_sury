@@ -48,7 +48,7 @@ public:
 
     // @brief Return the list of frames
     //
-    const FrameCoordsVec&
+    inline const FrameCoordsVec&
     frames(void) const;
 
     // @brief Set the time that this animation should take to reproduce all
@@ -112,7 +112,7 @@ Animation::clearFrames(void)
 
 // @brief Return the list of frames
 //
-const Animation::FrameCoordsVec&
+inline const Animation::FrameCoordsVec&
 Animation::frames(void) const
 {
     return m_frames;

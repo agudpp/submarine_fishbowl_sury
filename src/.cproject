@@ -28,6 +28,8 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/"/>
 									<listOptionValue builtIn="false" value="/usr/include/c++/4.7/"/>
 									<listOptionValue builtIn="false" value="/usr/include/"/>
+									<listOptionValue builtIn="false" value="/usr/include/i386-linux-gnu/c++/4.7/bits/"/>
+									<listOptionValue builtIn="false" value="/usr/include/i386-linux-gnu/c++/4.7/"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.724314056" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
@@ -37,6 +39,8 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/"/>
 									<listOptionValue builtIn="false" value="/usr/include/"/>
 									<listOptionValue builtIn="false" value="/usr/include/c++/4.7.3"/>
+									<listOptionValue builtIn="false" value="/usr/include/i386-linux-gnu/c++/4.7/bits/"/>
+									<listOptionValue builtIn="false" value="/usr/include/i386-linux-gnu/c++/4.7/"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.586085395" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
@@ -45,6 +49,8 @@
 									<listOptionValue builtIn="false" value="/usr/local/include/"/>
 									<listOptionValue builtIn="false" value="/usr/include/c++/4.7/"/>
 									<listOptionValue builtIn="false" value="/usr/include/"/>
+									<listOptionValue builtIn="false" value="/usr/include/i386-linux-gnu/c++/4.7/bits/"/>
+									<listOptionValue builtIn="false" value="/usr/include/i386-linux-gnu/c++/4.7/"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1990603190" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>

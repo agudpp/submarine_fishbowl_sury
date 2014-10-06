@@ -12,7 +12,7 @@ endif()
 # (you can also set it on the command line: -D CMAKE_BUILD_TYPE=Release)
 
 # flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g" )
 
 ################################################################################
 # includes dirs
@@ -25,6 +25,7 @@ set(HDRS
     ${DEV_ROOT_PATH}/game/Animation.h
     ${DEV_ROOT_PATH}/game/GameHandler.h
     ${DEV_ROOT_PATH}/game/Submarine.h
+    ${DEV_ROOT_PATH}/game/GameEntity.h
 )
     
 # sources
@@ -33,6 +34,7 @@ set(SRCS
     ${DEV_ROOT_PATH}/game/AnimHandler.cpp
     ${DEV_ROOT_PATH}/game/GameHandler.cpp
     ${DEV_ROOT_PATH}/game/Submarine.cpp
+    ${DEV_ROOT_PATH}/game/GameEntity.cpp
 )
 
 
