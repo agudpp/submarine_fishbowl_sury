@@ -32,13 +32,12 @@ GameEntity::~GameEntity()
 bool
 GameEntity::loadSpriteFromFile(const std::string& file)
 {
-    sf::Texture texture;
-    if (!texture.loadFromFile(file)) {
+    if (!m_texture.loadFromFile(file)) {
         debugERROR("We couldn't load the file %s to load the sprite\n", file.c_str());
         return false;
     }
 
-    m_sprite.setTexture(texture, true);
+    m_sprite.setTexture(m_texture, true);
     return true;
 }
 
@@ -58,6 +57,14 @@ GameEntity::loadAnimsFromFiles(const std::vector<std::string>& animsFiles)
     }
 
     return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+void
+GameEntity::update(float timeFrame)
+{
+    m_animHandler.update(timeFrame);
 }
 
 

@@ -151,14 +151,19 @@ AnimHandler::update(float timeFrame)
     }
 
     // now we need to get the frame we should set
-    m_currentTime += timeFrame;
     const float animTime = m_currentAnim->time();
-    if (m_loopAnim && m_currentTime >= animTime) {
-        while (m_currentTime >= animTime) m_currentTime -= animTime;
+    m_currentTime += timeFrame;
+    if (m_currentTime >= animTime) {
+        if (m_loopAnim) {
+            while (m_currentTime >= animTime) m_currentTime -= animTime;
+        } else {
+            // need to let the user know that the anim already end?
+            return;
+        }
     }
 
     // calculate the current index
-    const int index = m_currentTime / animTime;
+    const int index = (m_currentTime / animTime) * m_currentAnim->frames().size();
     if (index == m_currentFrameIndex) {
         // nothing to do
         return;
@@ -166,6 +171,12 @@ AnimHandler::update(float timeFrame)
 
     // else we need to change the index
     ASSERT(index < m_currentAnim->frames().size());
+#ifdef DEBUG
+    const sf::IntRect& rect = m_currentAnim->frames()[index];
+    debug("Changing to frame %d with texture rectangle to: %d, %d, %d, %d\n",
+          index, rect.top, rect.left, rect.width, rect.height);
+#endif
+
     m_sprite->setTextureRect(m_currentAnim->frames()[index]);
     m_currentFrameIndex = index;
 }

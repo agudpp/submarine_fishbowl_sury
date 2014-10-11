@@ -90,7 +90,7 @@ public:
     //        invalidated
     //
     inline void
-    getAnimations(std::vector<const Animation*>& animations) const;
+    getAnimations(std::vector<Animation>& animations) const;
 
     // @brief Main method where we will update the logic of the animation.
     // @param timeFrame     The frame time
@@ -148,12 +148,12 @@ AnimHandler::currentAnim(void) const
 }
 
 inline void
-AnimHandler::getAnimations(std::vector<const Animation*>& animations) const
+AnimHandler::getAnimations(std::vector<Animation>& animations) const
 {
     animations.clear();
     animations.reserve(m_animations.size());
     for (auto elem : m_animations) {
-        animations.push_back(&elem.second);
+        animations.push_back(elem.second);
     }
 }
 

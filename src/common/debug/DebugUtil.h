@@ -52,8 +52,6 @@
 	#include <assert.h>
 	#include <iostream>
 	#include <stdio.h>
-    #include <logger/LoggerManager.h>
-    #include <logger/Logger.h>
 
 
 

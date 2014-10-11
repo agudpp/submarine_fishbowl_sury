@@ -97,7 +97,14 @@ public:
     // check if we collide against other game entity
     // position accessors + seters
 
+
+    // @brief update method
+    //
+    void
+    update(float timeFrame);
+
 protected:
+    sf::Texture m_texture;
     sf::Sprite m_sprite;
     AnimHandler m_animHandler;
 };
