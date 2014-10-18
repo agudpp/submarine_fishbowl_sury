@@ -26,6 +26,7 @@ set(HDRS
     ${DEV_ROOT_PATH}/game/GameHandler.h
     ${DEV_ROOT_PATH}/game/Submarine.h
     ${DEV_ROOT_PATH}/game/GameEntity.h
+    ${DEV_ROOT_PATH}/game/ResourceManager.h
 )
     
 # sources
@@ -35,6 +36,7 @@ set(SRCS
     ${DEV_ROOT_PATH}/game/GameHandler.cpp
     ${DEV_ROOT_PATH}/game/Submarine.cpp
     ${DEV_ROOT_PATH}/game/GameEntity.cpp
+    ${DEV_ROOT_PATH}/game/ResourceManager.cpp
 )
 
 

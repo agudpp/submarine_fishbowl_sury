@@ -59,10 +59,18 @@ public:
     inline float
     time(void) const;
 
+    // @brief Set get the rotation for the anim
+    //
+    inline void
+    setRotation(float rotation);
+    inline float
+    rotation(void) const;
+
 private:
     std::string m_name;
     FrameCoordsVec m_frames;
     float m_time;
+    float m_rotation;
 };
 
 
@@ -80,6 +88,7 @@ private:
 inline Animation::Animation(const std::string& name) :
     m_name(name)
 ,   m_time(-1.f)
+,   m_rotation(0.f)
 {}
 
 // @brief Set / get the name
@@ -130,6 +139,17 @@ inline float
 Animation::time(void) const
 {
     return m_time;
+}
+
+inline void
+Animation::setRotation(float rotation)
+{
+    m_rotation = rotation;
+}
+inline float
+Animation::rotation(void) const
+{
+    return m_rotation;
 }
 
 } /* namespace game */

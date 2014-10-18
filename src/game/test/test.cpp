@@ -141,6 +141,12 @@ main(int argc, char** args)
                     }
                     changeAnim = true;
                 }
+
+                if (event.key.code == sf::Keyboard::Up) {
+                    static sf::Vector2f scale(1.f, 1.f);
+                    gameEntity.sprite().setScale(scale);
+                    scale.x += 0.1;
+                }
             }
         }
 

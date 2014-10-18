@@ -7,9 +7,9 @@
 
 #include <SFML/Graphics/Texture.hpp>
 
-#include <game/GameEntity.h>
 #include <common/debug/DebugUtil.h>
-
+#include <game/GameEntity.h>
+#include <game/ResourceManager.h>
 
 namespace game {
 
@@ -17,7 +17,8 @@ namespace game {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-GameEntity::GameEntity()
+GameEntity::GameEntity() :
+    m_life(0)
 {
     m_animHandler.setSprite(&m_sprite);
 }
@@ -32,12 +33,13 @@ GameEntity::~GameEntity()
 bool
 GameEntity::loadSpriteFromFile(const std::string& file)
 {
-    if (!m_texture.loadFromFile(file)) {
+    const sf::Texture* texture = ResourceManager::instance().getTexture(file);
+    if (texture == 0) {
         debugERROR("We couldn't load the file %s to load the sprite\n", file.c_str());
         return false;
     }
 
-    m_sprite.setTexture(m_texture, true);
+    m_sprite.setTexture(*texture, true);
     return true;
 }
 
@@ -61,10 +63,11 @@ GameEntity::loadAnimsFromFiles(const std::vector<std::string>& animsFiles)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void
+bool
 GameEntity::update(float timeFrame)
 {
     m_animHandler.update(timeFrame);
+    return true;
 }
 
 

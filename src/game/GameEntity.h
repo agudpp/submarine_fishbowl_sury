@@ -11,9 +11,10 @@
 #include <string>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 #include "AnimHandler.h"
-
+#include "PointMover.h"
 
 
 namespace game {
@@ -44,6 +45,11 @@ public:
     //
     bool
     loadAnimsFromFiles(const std::vector<std::string>& animsFiles);
+
+    // @brief Set the size of the sprite (in pixels not in %).
+    //
+    inline void
+    setSize(const sf::Vector2i& size);
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -98,15 +104,39 @@ public:
     // position accessors + seters
 
 
-    // @brief update method
+    // @brief Set / get life
     //
-    void
+    inline void
+    setLife(int life);
+    inline int
+    life(void) const;
+    inline bool
+    isAlive(void) const;
+
+    ////////////////////////////////////////////////////////////////////////////
+    // interface to implement
+
+    // @brief Init the game unit, return true on success | false otherwise
+    //        By default we return true;
+    //
+    virtual bool
+    init(void) {return true;}
+
+    // @brief We need to reimplement this in each unity since
+    virtual GameEntity*
+    clone(void) {return new GameEntity(*this);};
+
+    // @brief update method (if you re-implement this call m_animHandler.update()
+    //        if needed)
+    // @return true if we need to keep updating | false otherwise
+    //
+    virtual bool
     update(float timeFrame);
 
 protected:
-    sf::Texture m_texture;
     sf::Sprite m_sprite;
     AnimHandler m_animHandler;
+    int m_life;
 };
 
 
@@ -122,6 +152,12 @@ protected:
 ////////////////////////////////////////////////////////////////////////////
 // Inline
 
+
+inline void
+GameEntity::setSize(const sf::Vector2i& size)
+{
+    //TODO:m_sprite.set
+}
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -179,6 +215,22 @@ inline const AnimHandler&
 GameEntity::animHandler(void) const
 {
     return m_animHandler;
+}
+
+inline void
+GameEntity::setLife(int life)
+{
+    m_life = life;
+}
+inline int
+GameEntity::life(void) const
+{
+    return m_life;
+}
+inline bool
+GameEntity::isAlive(void) const
+{
+    return m_life > 0;
 }
 
 } /* namespace game */

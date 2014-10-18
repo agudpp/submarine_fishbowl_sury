@@ -44,6 +44,14 @@ AnimHandler::parseAnimFromFile(const std::string& fileName,
     ss >> time;
     anim.setTime(time);
 
+    // rotation
+    float rotation = 0.f;
+    std::getline(file, line);
+    ss.str("");ss.clear();
+    ss << line;
+    ss >> rotation;
+    anim.setRotation(rotation);
+
     // read num frames
     int numFrames = -1;
     std::getline(file, line);
@@ -129,6 +137,12 @@ AnimHandler::changeAnimation(const std::string& animName)
     m_currentAnim = &animIt->second;
     m_currentTime = 0.f;
     m_currentFrameIndex = 0;
+    m_sprite->setRotation(m_currentAnim->rotation());
+    if (!m_currentAnim->frames().empty()) {
+        // calculate center to set the origin
+        const sf::IntRect& r = m_currentAnim->frames()[0];
+        m_sprite->setOrigin(float(r.width) / 2.f, float(r.height) / 2.f);
+    }
     return true;
 }
 

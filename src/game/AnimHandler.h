@@ -32,6 +32,7 @@ public:
     //        file is as next (we will determine per line):
     //        animName\n
     //        animTime\n
+    //        rotation(degrees)\n
     //        numFrames\n
     //        top left width height\n     -- frame 0
     //        top2 left2 width2 height2\n -- frame 1
