@@ -21,22 +21,24 @@ include_directories(${DEV_ROOT_PATH})
 
 # headers
 set(HDRS
-    ${DEV_ROOT_PATH}/game/AnimHandler.h
-    ${DEV_ROOT_PATH}/game/Animation.h
-    ${DEV_ROOT_PATH}/game/GameHandler.h
-    ${DEV_ROOT_PATH}/game/Submarine.h
-    ${DEV_ROOT_PATH}/game/GameEntity.h
-    ${DEV_ROOT_PATH}/game/ResourceManager.h
+    ${DEV_ROOT_PATH}/game/anim/AnimHandler.h
+    ${DEV_ROOT_PATH}/game/anim/Animation.h
+    ${DEV_ROOT_PATH}/game/scene/SceneManager.h
+    ${DEV_ROOT_PATH}/game/scene/SceneObject.h
+    ${DEV_ROOT_PATH}/game/scene/AnimatedSceneObject.h
+    ${DEV_ROOT_PATH}/game/effects/Effect.h
+    ${DEV_ROOT_PATH}/game/resources/ResourceManager.h
 )
     
 # sources
 set(SRCS
     ${DEV_ROOT_PATH}/game/test/test.cpp
-    ${DEV_ROOT_PATH}/game/AnimHandler.cpp
-    ${DEV_ROOT_PATH}/game/GameHandler.cpp
-    ${DEV_ROOT_PATH}/game/Submarine.cpp
-    ${DEV_ROOT_PATH}/game/GameEntity.cpp
-    ${DEV_ROOT_PATH}/game/ResourceManager.cpp
+    ${DEV_ROOT_PATH}/game/anim/AnimHandler.cpp
+    ${DEV_ROOT_PATH}/game/scene/SceneManager.cpp
+    ${DEV_ROOT_PATH}/game/scene/SceneObject.cpp
+    ${DEV_ROOT_PATH}/game/scene/AnimatedSceneObject.cpp
+    ${DEV_ROOT_PATH}/game/effects/Effect.cpp
+    ${DEV_ROOT_PATH}/game/resources/ResourceManager.cpp
 )
 
 

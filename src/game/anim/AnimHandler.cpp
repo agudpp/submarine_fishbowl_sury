@@ -15,7 +15,7 @@
 
 
 
-#define PRECONDITION ASSERT(m_sprite != 0)
+#define PRECONDITION ASSERT(m_shape != 0)
 
 namespace game {
 
@@ -81,7 +81,7 @@ AnimHandler::parseAnimFromFile(const std::string& fileName,
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 AnimHandler::AnimHandler() :
-    m_sprite(0)
+    m_shape(0)
 ,   m_currentAnim(0)
 ,   m_loopAnim(false)
 ,   m_currentTime(0.f)
@@ -99,9 +99,9 @@ AnimHandler::~AnimHandler()
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-AnimHandler::setSprite(sf::Sprite* sprite)
+AnimHandler::setShape(sf::RectangleShape* shape)
 {
-    m_sprite = sprite;
+    m_shape = shape;
     m_currentFrameIndex = 0;
     m_currentAnim = 0;
     m_currentTime = 0.f;
@@ -135,13 +135,15 @@ AnimHandler::changeAnimation(const std::string& animName)
 
     // set the new anim
     m_currentAnim = &animIt->second;
+    ASSERT(m_currentAnim != 0);
     m_currentTime = 0.f;
     m_currentFrameIndex = 0;
-    m_sprite->setRotation(m_currentAnim->rotation());
+    m_shape->setRotation(m_currentAnim->rotation());
     if (!m_currentAnim->frames().empty()) {
         // calculate center to set the origin
         const sf::IntRect& r = m_currentAnim->frames()[0];
-        m_sprite->setOrigin(float(r.width) / 2.f, float(r.height) / 2.f);
+        m_shape->setOrigin(float(r.width) / 2.f, float(r.height) / 2.f);
+        m_shape->setTextureRect(m_currentAnim->frames().front());
     }
     return true;
 }
@@ -191,7 +193,7 @@ AnimHandler::update(float timeFrame)
           index, rect.top, rect.left, rect.width, rect.height);
 #endif
 
-    m_sprite->setTextureRect(m_currentAnim->frames()[index]);
+    m_shape->setTextureRect(m_currentAnim->frames()[index]);
     m_currentFrameIndex = index;
 }
 

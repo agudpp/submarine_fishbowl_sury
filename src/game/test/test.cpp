@@ -12,42 +12,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include <game/AnimHandler.h>
-#include <game/Animation.h>
-#include <game/GameEntity.h>
 #include <common/debug/DebugUtil.h>
-
-
-
-// @brief show help
-//
-static void
-showHelp(void)
-{
-    std::cout << "Para usar la app tenes que ejecutarla como sigue desde la "
-              << "linea de comando: \n\n"
-              << "\t./sfmltest <textureFile> <textureFile1> [<textureFile2>] [<textureFile3>] ...\n\n"
-              << "Donde\n"
-              << "\t<textureFile> es el nombre de la textura asociada a la animacion\n"
-              << "\t<animFile1> es el nombre del archivo de la animacion 1 (.txt)\n"
-              << "\t<animFile2> es el nombre del archivo de la animacion 2 si existe (.txt)\n"
-              << "\t\t y asi sucesivamente para cargar todas las animaciones que querramos";
-}
-
-
-// @brief Load the entity
-//
-static bool
-loadGameEntity(const std::string& texture,
-               const std::vector<std::string>& animFiles,
-               game::GameEntity& ge)
-{
-    if (!ge.loadSpriteFromFile(texture) || !ge.loadAnimsFromFiles(animFiles)) {
-        return false;
-    }
-
-    return true;
-}
+#include <game/scene/SceneManager.h>
+#include <game/effects/Effect.h>
 
 
 int
@@ -55,58 +22,16 @@ main(int argc, char** args)
 {
     // create the window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Anim Test");
+    game::SceneManager sceneMngr;
 
-    // check args
-    if (argc < 3) {
-        showHelp();
+    game::SceneManager::InitData initdata;
+    initdata.renderTarge = &window;
+    const sf::Vector2u& rtsize = window.getSize();
+    initdata.screenSize = sf::IntRect(0,0,rtsize.x, rtsize.y);
+    if (!sceneMngr.init(initdata)) {
+        debugERROR("Error initializing the scene manager\n");
         return -1;
     }
-
-    // get the files now to be used
-    std::vector<std::string> animFiles;
-    const std::string textFile = args[1];
-    for (int i = 2; i < argc; ++i) {
-        animFiles.push_back(args[i]);
-    }
-
-    game::GameEntity gameEntity;
-    if (!loadGameEntity(textFile, animFiles, gameEntity)) {
-        std::cerr << "Error loading the game entity, some file is wrong? " <<
-                     "\n" << textFile << "\n";
-        return -1;
-    }
-
-    // get the animations to play
-    const game::AnimHandler& animHandler = gameEntity.animHandler();
-    std::vector<game::Animation> animations;
-    int currentAnim = 0;
-    animHandler.getAnimations(animations);
-    debug("We have %d animations: \n", animations.size());
-    for (unsigned int i = 0; i < animations.size(); ++i) {
-        debug("Anim[%d]: %s\n", i, animations[i].name().c_str());
-    }
-    if (animations.empty() || animations.front().frames().empty()) {
-        std::cerr << "No animations were loaded??\n";
-        return false;
-    }
-
-    gameEntity.changeAnimation(animations[currentAnim].name());
-    gameEntity.setAnimLoop(true);
-    gameEntity.sprite().setPosition(100, 100);
-
-    // now we will show the sprite in the middle position and also show the
-    // sprite with the animation name
-    sf::Font font;
-    if (!font.loadFromFile("font.ttf")) {
-        debugERROR("The file font \"font.ttf\" is not in the same folder where the"
-                   " app is... No text will be shown\n");
-    }
-    sf::Text animText;
-    animText.setFont(font);
-    animText.setColor(sf::Color::White);
-    animText.setPosition(0,0);
-    animText.setCharacterSize(30);
-    animText.setString(animations[currentAnim].name());
 
 
     sf::Clock clock;
@@ -129,48 +54,21 @@ main(int argc, char** args)
 
             if (event.type == sf::Event::KeyReleased) {
                 if (event.key.code == sf::Keyboard::Left) {
-                    currentAnim -= 1;
-                    if (currentAnim < 0) {
-                        currentAnim = animations.size() - 1;
-                    }
-                    changeAnim = true;
+                    // create an effect
+                    const float xrnd = static_cast<float>(std::rand() % 999) / 999.f;
+                    const float yrnd = static_cast<float>(std::rand() % 999) / 999.f;
+
+                    sceneMngr.playEffect(game::Effect::EffectType::ET_EXPLOSION,
+                                         sf::Vector2f(xrnd, yrnd));
                 } else if (event.key.code == sf::Keyboard::Right) {
-                    currentAnim += 1;
-                    if (currentAnim >= animations.size()) {
-                        currentAnim = 0;
-                    }
-                    changeAnim = true;
+
                 }
 
-                if (event.key.code == sf::Keyboard::Up) {
-                    static sf::Vector2f scale(1.f, 1.f);
-                    gameEntity.sprite().setScale(scale);
-                    scale.x += 0.1;
-                }
-            }
-        }
-
-
-
-        if (changeAnim) {
-            const std::string& name = animations[currentAnim].name();
-            if (!gameEntity.changeAnimation(name)) {
-                debugERROR("Error trying to change the animation to %s\n", name.c_str());
-            } else {
-                gameEntity.setAnimLoop(true);
-                animText.setString(name);
             }
         }
 
         // update all the entities
-        gameEntity.update(timeFrame);
-
-        // clear the window with black color
-        window.clear(sf::Color::Black);
-
-        // draw everything here...
-        window.draw(gameEntity.sprite());
-        window.draw(animText);
+        sceneMngr.update(timeFrame);
 
         // end the current frame
         window.display();

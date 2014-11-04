@@ -5,7 +5,7 @@
  *      Author: agustin
  */
 
-#include <game/ResourceManager.h>
+#include "ResourceManager.h"
 
 #include <common/debug/DebugUtil.h>
 

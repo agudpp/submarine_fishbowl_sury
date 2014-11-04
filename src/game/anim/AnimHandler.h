@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include <common/debug/DebugUtil.h>
 
@@ -43,11 +43,11 @@ public:
     parseAnimFromFile(const std::string& fileName,
                       Animation& anim);
 
-    // @brief Set the sprite that we want to change the texture using the
+    // @brief Set the shape that we want to change the texture using the
     //        current animation frames information
     //
     void
-    setSprite(sf::Sprite* sprite);
+    setShape(sf::RectangleShape* shape);
 
     // @brief Add an animation to the list of animations that this handler handle
     // @return true on success | false if the animation already exists (name)
@@ -101,7 +101,7 @@ public:
 
 
 private:
-    sf::Sprite* m_sprite;
+    sf::RectangleShape* m_shape;
     Animation* m_currentAnim;
     std::map<std::string, Animation> m_animations;
     bool m_loopAnim;
