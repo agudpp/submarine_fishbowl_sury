@@ -54,6 +54,9 @@ Effect::config(const sf::Vector2f& position, const SceneObject* attach)
 bool
 Effect::update(float timeFrame)
 {
+    if (m_attach != 0) {
+        setPosition(m_attach->position());
+    }
     // what we have to do is basically update the animation until we finish
     // and then we just end the effect
     m_animHandler.update(timeFrame);

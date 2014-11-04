@@ -27,6 +27,7 @@ set(HDRS
     ${DEV_ROOT_PATH}/game/scene/SceneObject.h
     ${DEV_ROOT_PATH}/game/scene/AnimatedSceneObject.h
     ${DEV_ROOT_PATH}/game/effects/Effect.h
+    ${DEV_ROOT_PATH}/game/player/Submarine.h
     ${DEV_ROOT_PATH}/game/resources/ResourceManager.h
 )
     
@@ -38,6 +39,7 @@ set(SRCS
     ${DEV_ROOT_PATH}/game/scene/SceneObject.cpp
     ${DEV_ROOT_PATH}/game/scene/AnimatedSceneObject.cpp
     ${DEV_ROOT_PATH}/game/effects/Effect.cpp
+    ${DEV_ROOT_PATH}/game/player/Submarine.cpp
     ${DEV_ROOT_PATH}/game/resources/ResourceManager.cpp
 )
 

@@ -15,6 +15,7 @@
 #include <common/debug/DebugUtil.h>
 #include <game/scene/SceneManager.h>
 #include <game/effects/Effect.h>
+#include <game/player/Submarine.h>
 
 
 int
@@ -23,6 +24,7 @@ main(int argc, char** args)
     // create the window
     sf::RenderWindow window(sf::VideoMode(800, 600), "Anim Test");
     game::SceneManager sceneMngr;
+    game::Submarine submarine;
 
     game::SceneManager::InitData initdata;
     initdata.renderTarge = &window;
@@ -32,6 +34,10 @@ main(int argc, char** args)
         debugERROR("Error initializing the scene manager\n");
         return -1;
     }
+
+    // add the player
+    submarine.showDebugBB(true);
+    sceneMngr.addExternalSceneObject(&submarine);
 
 
     sf::Clock clock;
@@ -55,15 +61,33 @@ main(int argc, char** args)
             if (event.type == sf::Event::KeyReleased) {
                 if (event.key.code == sf::Keyboard::Left) {
                     // create an effect
-                    const float xrnd = static_cast<float>(std::rand() % 999) / 999.f;
+                    /*const float xrnd = static_cast<float>(std::rand() % 999) / 999.f;
                     const float yrnd = static_cast<float>(std::rand() % 999) / 999.f;
 
-                    sceneMngr.playEffect(game::Effect::EffectType::ET_EXPLOSION,
+                    const game::SceneObject* explosion = sceneMngr.playEffect(game::Effect::EffectType::ET_EXPLOSION,
                                          sf::Vector2f(xrnd, yrnd));
+                    sceneMngr.playEffect(game::Effect::EffectType::ET_3SEC_COUNTER,
+                                         sf::Vector2f(0, 0),
+                                         explosion);
+                                         */
                 } else if (event.key.code == sf::Keyboard::Right) {
 
                 }
 
+            }
+
+            if (event.type == sf::Event::KeyPressed) {
+                static const float velFactor = 10.1f;
+                sf::Vector2f resultVec(0,0);
+                switch (event.key.code) {
+                case sf::Keyboard::Left: resultVec.x -= velFactor * timeFrame; break;
+                case sf::Keyboard::Right: resultVec.x += velFactor * timeFrame; break;
+                case sf::Keyboard::Up: resultVec.y -= velFactor * timeFrame; break;
+                case sf::Keyboard::Down: resultVec.y += velFactor * timeFrame; break;
+                }
+                if (resultVec.x != 0.f || resultVec.y != 0.f) {
+                    submarine.setPosition(submarine.position() + resultVec);
+                }
             }
         }
 

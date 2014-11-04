@@ -49,6 +49,17 @@ public:
     init(const InitData& data);
 
     ////////////////////////////////////////////////////////////////////////////
+    // General api for scene objects
+
+    // @brief Add / remove an external scene object that will be updated
+    //        until the "update" method returns false.
+    //
+    void
+    addExternalSceneObject(SceneObject* so);
+    void
+    removeExternalSceneObject(SceneObject* so);
+
+    ////////////////////////////////////////////////////////////////////////////
     // Effect API
 
     // @brief Start a new effect of a specific type in a certain position
@@ -57,10 +68,11 @@ public:
     // @param position      The position where we want to play it (scene).
     // @param attach        The scene object to where we want to attach the
     //                      effect or Null if not.
+    // @return the associated effect | 0 on error
     // @note after calling this method the effect will be reproduced
     //       automatically
     //
-    void
+    const Effect*
     playEffect(Effect::EffectType effectType,
                const sf::Vector2f& position,
                const SceneObject* attach = 0);
@@ -89,6 +101,11 @@ private:
     void
     updateEffects(float timeFrame);
 
+    // @brief Update the external scene objects
+    //
+    void
+    updateExternals(float timeFrame);
+
     // @brief Coordinates transformation method, from scene coordinates to
     //        screen coordinates
     //        The scene will be between 0,0 (top left) to (1,1) bottom right.
@@ -96,7 +113,9 @@ private:
     // @return screenPos already transformed
     //
     inline sf::Vector2f
-    sceneToScreen(const sf::Vector2f& scenePos) const;
+    sceneToScreenPos(const sf::Vector2f& scenePos) const;
+    inline sf::Vector2f
+    sceneToScreenSize(const sf::Vector2f& sceneSize) const;
 
     // @brief This method should be called everytime we add something to the
     //        scene / remove from it (effect / objects / units / whatever).
@@ -115,8 +134,10 @@ private:
     sf::IntRect m_screenSize;
     sf::Vector2f m_sceneToScreenTf;
     SceneObjectsVec m_sceneObjs;        // all the objects we will render
-
     SceneObjectsVec m_renderQueues[SceneObject::RenderLayer::RL_COUNT];
+
+    // external
+    SceneObjectsVec m_externals;
 
     // effects
     std::vector<Effect*> m_activeEffects;
@@ -139,11 +160,18 @@ private:
 //
 
 inline sf::Vector2f
-SceneManager::sceneToScreen(const sf::Vector2f& scenePos) const
+SceneManager::sceneToScreenPos(const sf::Vector2f& scenePos) const
 {
     return sf::Vector2f(scenePos.x * m_sceneToScreenTf.x,
                         scenePos.y * m_sceneToScreenTf.y);
 }
+inline sf::Vector2f
+SceneManager::sceneToScreenSize(const sf::Vector2f& sceneSize) const
+{
+    return sf::Vector2f(sceneSize.x * m_sceneToScreenTf.x,
+                        sceneSize.y * m_sceneToScreenTf.y);
+}
+
 inline void
 SceneManager::addSceneObject(SceneObject* so)
 {

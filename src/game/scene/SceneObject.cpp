@@ -20,6 +20,7 @@ namespace game {
 SceneObject::SceneObject() :
     m_texture(0)
 ,   m_renderLayer(RenderLayer::RL_NORMAL)
+,   m_isVisible(true)
 {
     // TODO Auto-generated constructor stub
 

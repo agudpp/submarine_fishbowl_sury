@@ -8,7 +8,8 @@
 #include "SceneManager.h"
 
 
-#define EXPLOSION_EFFECT_COUNT  3
+#define EXPLOSION_EFFECT_COUNT      3
+#define COUNTER_EFFECT_COUNT        3
 
 namespace game {
 
@@ -30,8 +31,24 @@ SceneManager::initEffects(void)
             debugERROR("Error loading the animations for the explosions\n");
             return false;
         }
-        effect->setSize(sf::Vector2f(0.1f, 0.1f));
-        effect->shape().setSize(sf::Vector2f(266.1f, 200.1f));
+        effect->setSize(sf::Vector2f(0.3, 0.2));
+        m_effectQueues[et].push(effect);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // for now we will create 3 explosions?
+    et = Effect::EffectType::ET_3SEC_COUNTER;
+    for (unsigned int i = 0; i < COUNTER_EFFECT_COUNT; ++i) {
+        Effect* effect = new Effect(et);
+        if (!effect->setTextureFromFile("./media/game/effects/conteo/conteo.png")) {
+            debugERROR("Error loading texture for conteo effect\n");
+            return false;
+        }
+        if (!effect->init("./media/game/effects/conteo/conteo.txt")) {
+            debugERROR("Error loading the animations for the conteo effect\n");
+            return false;
+        }
+        effect->setSize(sf::Vector2f(0.3, 0.2));
         m_effectQueues[et].push(effect);
     }
 
@@ -54,6 +71,20 @@ SceneManager::updateEffects(float timeFrame)
             ASSERT(effect->effectType() < Effect::EffectType::ET_MAX);
             m_effectQueues[effect->effectType()].push(effect);
             removeSceneObject(effect);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+void
+SceneManager::updateExternals(float timeFrame)
+{
+    for (unsigned int i = 0; i < m_externals.size(); ++i) {
+        if (!m_externals[i]->update(timeFrame)) {
+            // remove this
+            common::Helper::remAndSwapElem(i, m_externals);
+            --i;
+            removeSceneObject(m_externals[i]);
         }
     }
 }
@@ -108,7 +139,27 @@ SceneManager::init(const InitData& data)
 }
 
 ////////////////////////////////////////////////////////////////////////////
+// General api for scene objects
+
+
 void
+SceneManager::addExternalSceneObject(SceneObject* so)
+{
+    ASSERT(so != 0);
+    m_externals.push_back(so);
+    addSceneObject(so);
+}
+////////////////////////////////////////////////////////////////////////////
+void
+SceneManager::removeExternalSceneObject(SceneObject* so)
+{
+    ASSERT(so != 0);
+    common::Helper::remAndSwapIfExists(so, m_externals);
+    removeSceneObject(so);
+}
+
+////////////////////////////////////////////////////////////////////////////
+const Effect*
 SceneManager::playEffect(Effect::EffectType effectType,
                          const sf::Vector2f& position,
                          const SceneObject* attach)
@@ -120,7 +171,7 @@ SceneManager::playEffect(Effect::EffectType effectType,
     if (queue.empty()) {
         debugWARNING("We cannot reproduce that effect we have no more of that %d.\n",
                      effectType);
-        return;
+        return 0;
     }
 
     // get the effect and start it on where we want
@@ -131,6 +182,8 @@ SceneManager::playEffect(Effect::EffectType effectType,
 
     // add the object to be rendered in the scnee
     addSceneObject(effect);
+
+    return effect;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -160,17 +213,26 @@ SceneManager::update(float timeFrame)
 
     // first of all update the logic here
     updateEffects(timeFrame);
+    updateExternals(timeFrame);
 
     // now we will render them but before that we need to update also the
     // position / size of the object from scene coordinates to screen ones
     for (unsigned int i = 0; i < m_sceneObjs.size(); ++i) {
         SceneObject* so = m_sceneObjs[i];
-        // set the correct position
-        const sf::Vector2f screenPos = sceneToScreen(so->position());
-        so->shape().setPosition(screenPos);
+        sf::RectangleShape& shape = so->shape();
+
+        // set the correct position and size
+        const sf::Vector2f screenPos = sceneToScreenPos(so->position());
+        shape.setPosition(screenPos);
+
+        const sf::Vector2f screenSize = sceneToScreenPos(so->sceneSize());
+        shape.setSize(screenSize);
+
         // put this element also in the associated render queue
         ASSERT(so->renderLayer() < SceneObject::RenderLayer::RL_COUNT);
-        m_renderQueues[so->renderLayer()].push_back(so);
+        if (so->isVisible()) {
+            m_renderQueues[so->renderLayer()].push_back(so);
+        }
     }
 
     // now we will render the objects in the correct layers.

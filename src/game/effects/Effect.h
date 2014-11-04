@@ -18,6 +18,7 @@ public:
     // enum of effect ID / type.
     enum EffectType {
         ET_EXPLOSION = 0,
+        ET_3SEC_COUNTER,
 
         ET_MAX,
     };

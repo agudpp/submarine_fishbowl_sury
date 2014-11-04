@@ -87,6 +87,13 @@ public:
     inline sf::RectangleShape&
     shape(void);
 
+    // @brief Set / get visibility of this scene object
+    //
+    inline void
+    setVisible(bool visible);
+    inline bool
+    isVisible(void) const;
+
     // @brief main update method that will be called each frame until we
     //        return false.
     //
@@ -99,6 +106,7 @@ protected:
     sf::Vector2f m_position;
     sf::Vector2f m_size;
     RenderLayer m_renderLayer;
+    bool m_isVisible;
 };
 
 
@@ -177,7 +185,16 @@ SceneObject::shape(void)
 {
     return m_shape;
 }
-
+inline void
+SceneObject::setVisible(bool visible)
+{
+    m_isVisible = visible;
+}
+inline bool
+SceneObject::isVisible(void) const
+{
+    return m_isVisible;
+}
 
 } /* namespace game */
 
