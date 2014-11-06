@@ -72,6 +72,8 @@ main(int argc, char** args)
                                          */
                 } else if (event.key.code == sf::Keyboard::Right) {
 
+                } else if (event.key.code == sf::Keyboard::Space) {
+                    sceneMngr.createEnemy(game::EnemyUnit::EnemyType::FISH);
                 }
 
             }

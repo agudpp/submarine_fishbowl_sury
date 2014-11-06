@@ -15,6 +15,7 @@ Effect::Effect(EffectType et) :
     m_effectType(et)
 ,   m_attach(0)
 {
+    setRenderLayer(RenderLayer::RL_FRONT);
 }
 
 Effect::~Effect()

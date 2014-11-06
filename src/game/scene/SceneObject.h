@@ -24,10 +24,10 @@ public:
     // Set the render layer we want to use to render this SceneObject
     //
     enum RenderLayer {
-        RL_FAR_BACK = 0,
-        RL_BACK,
+        RL_BACK = 0,
         RL_NORMAL,
         RL_FRONT,
+        RL_HUD,
 
         RL_COUNT,
     };
@@ -94,6 +94,14 @@ public:
     inline bool
     isVisible(void) const;
 
+    // @brief Set / check collision enable / disable
+    //
+    inline void
+    setCollisionsEnable(bool enable);
+    inline bool
+    areCollisionsEnabled(void) const;
+
+
     // @brief main update method that will be called each frame until we
     //        return false.
     //
@@ -107,6 +115,7 @@ protected:
     sf::Vector2f m_size;
     RenderLayer m_renderLayer;
     bool m_isVisible;
+    bool m_collEnabled;
 };
 
 
@@ -194,6 +203,17 @@ inline bool
 SceneObject::isVisible(void) const
 {
     return m_isVisible;
+}
+
+inline void
+SceneObject::setCollisionsEnable(bool enable)
+{
+    m_collEnabled = enable;
+}
+inline bool
+SceneObject::areCollisionsEnabled(void) const
+{
+    return m_collEnabled;
 }
 
 } /* namespace game */

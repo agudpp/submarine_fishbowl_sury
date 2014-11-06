@@ -4,14 +4,12 @@
  *  Created on: Sep 21, 2014
  *      Author: agustin
  */
-
-#include "AnimHandler.h"
-
-#include <string>
-#include <fstream>
-#include <sstream>
-
 #include <common/debug/DebugUtil.h>
+#include <game/anim/AnimHandler.h>
+#include <SFML/Graphics/Rect.hpp>
+#include <sstream>
+#include <fstream>
+#include <string>
 
 
 
@@ -34,6 +32,10 @@ AnimHandler::parseAnimFromFile(const std::string& fileName,
 
     std::string line;
     std::getline(file, line);
+    if (!line.empty() && (line.back() == '\t' || line.back() == '\r' ||
+        line.back() == '\n')) {
+        line.pop_back();
+    }
     anim.setName(line);
 
     // time
@@ -119,6 +121,8 @@ AnimHandler::addAnimation(const Animation& anim)
         return false;
     }
 
+    debug("Adding animation %s\n", anim.name().c_str());
+
     m_animations[anim.name()] = anim;
     return true;
 }
@@ -187,17 +191,16 @@ AnimHandler::update(float timeFrame)
 
     // else we need to change the index
     ASSERT(index < m_currentAnim->frames().size());
-#ifdef DEBUG
-    const sf::IntRect& rect = m_currentAnim->frames()[index];
-    debug("Changing to frame %d with texture rectangle to: %d, %d, %d, %d\n",
-          index, rect.top, rect.left, rect.width, rect.height);
-#endif
+//#ifdef DEBUG
+//    const sf::IntRect& rect = m_currentAnim->frames()[index];
+//    debug("Changing to frame %d with texture rectangle to: %d, %d, %d, %d\n",
+//          index, rect.top, rect.left, rect.width, rect.height);
+//#endif
 
     m_shape->setTextureRect(m_currentAnim->frames()[index]);
     m_currentFrameIndex = index;
 }
 
 } /* namespace game */
-
 
 #undef PRECONDITION

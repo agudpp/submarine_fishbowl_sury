@@ -7,9 +7,12 @@
 
 #include "SceneManager.h"
 
+#include <game/enemies/FishEnemyUnit.h>
+
 
 #define EXPLOSION_EFFECT_COUNT      3
 #define COUNTER_EFFECT_COUNT        3
+#define COUNtER_ENEMIES_FISHES      12
 
 namespace game {
 
@@ -56,6 +59,23 @@ SceneManager::initEffects(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////
+bool
+SceneManager::initEnemies(void)
+{
+    EnemyUnit::EnemyType et = EnemyUnit::EnemyType::FISH;
+    for (unsigned int i = 0; i < COUNtER_ENEMIES_FISHES; ++i) {
+        FishEnemyUnit* enemy = new FishEnemyUnit();
+        if (!enemy->init()) {
+            debugERROR("Error initializing the fish enemies\n");
+            return false;
+        }
+        m_enemiesQueues[et].push(enemy);
+    }
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////
 void
 SceneManager::updateEffects(float timeFrame)
 {
@@ -73,6 +93,27 @@ SceneManager::updateEffects(float timeFrame)
             removeSceneObject(effect);
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////
+void
+SceneManager::updateEnemies(float timeFrame)
+{
+    // update all the enemies
+    for (unsigned int i = 0; i < m_enemies.size(); ++i) {
+        EnemyUnit* enemy = m_enemies[i];
+        if (!enemy->update(timeFrame)) {
+            // we need to remove this
+            common::Helper::remAndSwapIfExists(enemy, m_enemies);
+            --i;
+
+            // put it again in the correct queue
+            ASSERT(enemy->enemyType() < EnemyUnit::EnemyType::COUNT);
+            m_enemiesQueues[enemy->enemyType()].push(enemy);
+            removeSceneObject(enemy);
+        }
+    }
+
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -132,6 +173,11 @@ SceneManager::init(const InitData& data)
     // init the different things
     if (!initEffects()) {
         debugERROR("Error initializing the effects\n");
+        return false;
+    }
+
+    if (!initEnemies()) {
+        debugERROR("Error initializing the enemies\n");
         return false;
     }
 
@@ -203,6 +249,38 @@ SceneManager::stopAllEffects(void)
 
 ////////////////////////////////////////////////////////////////////////////
 
+const EnemyUnit*
+SceneManager::createEnemy(EnemyUnit::EnemyType enemyType)
+{
+    ASSERT(enemyType < EnemyUnit::EnemyType::COUNT);
+
+    // we will try to create an enemy if we have
+    EnemyQueue& queue = m_enemiesQueues[enemyType];
+    if (queue.empty()) {
+        debugWARNING("We don't have an enemy to create it\n");
+        return 0;
+    }
+
+    EnemyUnit* enemy = queue.front();
+    queue.pop();
+    ASSERT(enemy != 0);
+
+    // add it to the enemies active vector and configure it
+    FishEnemyUnit* fishUnit = static_cast<FishEnemyUnit*>(enemy);
+    // set random position
+    const float xrand = static_cast<float>(std::rand() % 999) / 999.f;
+    const float rndSecs = 3.f + (std::rand() % 4);
+    const float y = 1.f + fishUnit->sceneSize().y;
+    fishUnit->configure(sf::Vector2f(xrand,y), FishEnemyUnit::MovingDir::DIR_UP, rndSecs);
+
+    m_enemies.push_back(enemy);
+
+    // add it to the scene object
+    addSceneObject(enemy);
+}
+
+////////////////////////////////////////////////////////////////////////////
+
 void
 SceneManager::update(float timeFrame)
 {
@@ -214,6 +292,7 @@ SceneManager::update(float timeFrame)
     // first of all update the logic here
     updateEffects(timeFrame);
     updateExternals(timeFrame);
+    updateEnemies(timeFrame);
 
     // now we will render them but before that we need to update also the
     // position / size of the object from scene coordinates to screen ones

@@ -13,9 +13,10 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-#include <game/effects/Effect.h>
 #include <common/helpers/Helper.h>
 #include <common/debug/DebugUtil.h>
+#include <game/effects/Effect.h>
+#include <game/enemies/EnemyUnit.h>
 
 #include "SceneObject.h"
 
@@ -83,6 +84,19 @@ public:
     stopAllEffects(void);
 
     ////////////////////////////////////////////////////////////////////////////
+    // Enemies API
+
+    // @brief Create a new enemy of an specific type (the logic of where
+    //        will be created will be handled by the scene manager)
+    // @param enemyType     The type of enemy to create
+    // @return the associated enemy | 0 on error
+    // @note after calling this method the effect will be reproduced
+    //       automatically
+    //
+    const EnemyUnit*
+    createEnemy(EnemyUnit::EnemyType enemyType);
+
+    ////////////////////////////////////////////////////////////////////////////
 
     // @brief Main update method to update all the logic of the scene.
     //
@@ -96,10 +110,20 @@ private:
     bool
     initEffects(void);
 
+    // @brief Init the different type of enemies
+    //
+    bool
+    initEnemies(void);
+
     // @brief Update all the effects and effect logic we have.
     //
     void
     updateEffects(float timeFrame);
+
+    // @brief Update the enemies
+    //
+    void
+    updateEnemies(float timeFrame);
 
     // @brief Update the external scene objects
     //
@@ -129,12 +153,19 @@ private:
 private:
     typedef std::queue<Effect*> EffectQueue;
     typedef std::vector<SceneObject*> SceneObjectsVec;
+    typedef std::queue<EnemyUnit*> EnemyQueue;
+    typedef std::vector<EnemyUnit*> Enemyvec;
 
     sf::RenderTarget* m_renderTarget;
     sf::IntRect m_screenSize;
     sf::Vector2f m_sceneToScreenTf;
     SceneObjectsVec m_sceneObjs;        // all the objects we will render
     SceneObjectsVec m_renderQueues[SceneObject::RenderLayer::RL_COUNT];
+
+    // enemies
+    EnemyQueue m_enemiesQueues[EnemyUnit::EnemyType::COUNT];
+    Enemyvec m_enemies;
+
 
     // external
     SceneObjectsVec m_externals;
