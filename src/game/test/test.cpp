@@ -16,6 +16,7 @@
 #include <game/scene/SceneManager.h>
 #include <game/effects/Effect.h>
 #include <game/player/Submarine.h>
+#include <game/enemies/FishEnemyUnit.h>
 
 
 int
@@ -38,8 +39,9 @@ main(int argc, char** args)
     // add the player
     submarine.showDebugBB(true);
     sceneMngr.addExternalSceneObject(&submarine);
+    sceneMngr.setPlayer(&submarine);
 
-
+    game::FishEnemyUnit* fish = 0;
     sf::Clock clock;
 
     // run the program as long as the window is open
@@ -72,8 +74,17 @@ main(int argc, char** args)
                                          */
                 } else if (event.key.code == sf::Keyboard::Right) {
 
-                } else if (event.key.code == sf::Keyboard::Space) {
-                    sceneMngr.createEnemy(game::EnemyUnit::EnemyType::FISH);
+                } else if (event.key.code == sf::Keyboard::Num1) {
+                    fish = (game::FishEnemyUnit*) sceneMngr.createEnemy(game::EnemyUnit::EnemyType::FISH);
+                } else if (event.key.code == sf::Keyboard::D) {
+                    if (fish != 0) {
+                        fish->setLife(-1);
+                    }
+                } else if (event.key.code == sf::Keyboard::Num2) {
+                    const float xrnd = static_cast<float>(std::rand() % 999) / 999.f;
+                    const float yrnd = static_cast<float>(std::rand() % 999) / 999.f;
+                    const sf::Vector2f pos(xrnd, yrnd);
+                    sceneMngr.createElement(game::ElementObject::Type::EOT_MINE, pos);
                 }
 
             }

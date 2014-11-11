@@ -8,11 +8,20 @@
 #include "SceneManager.h"
 
 #include <game/enemies/FishEnemyUnit.h>
+#include <game/elements/BombElement.h>
 
 
 #define EXPLOSION_EFFECT_COUNT      3
 #define COUNTER_EFFECT_COUNT        3
 #define COUNtER_ENEMIES_FISHES      12
+#define COUNTER_ELEMENTS_MINES      12
+
+// update the size macro
+#define UPDATE_SIZE(so)\
+    {\
+    const sf::Vector2f screenSize = sceneToScreenPos(so->sceneSize());\
+    so->shape().setSize(screenSize);\
+    }
 
 namespace game {
 
@@ -35,6 +44,8 @@ SceneManager::initEffects(void)
             return false;
         }
         effect->setSize(sf::Vector2f(0.3, 0.2));
+        // update the size
+        UPDATE_SIZE(effect);
         m_effectQueues[et].push(effect);
     }
 
@@ -52,6 +63,7 @@ SceneManager::initEffects(void)
             return false;
         }
         effect->setSize(sf::Vector2f(0.3, 0.2));
+        UPDATE_SIZE(effect);
         m_effectQueues[et].push(effect);
     }
 
@@ -69,7 +81,26 @@ SceneManager::initEnemies(void)
             debugERROR("Error initializing the fish enemies\n");
             return false;
         }
+        UPDATE_SIZE(enemy);
         m_enemiesQueues[et].push(enemy);
+    }
+
+    return true;
+}
+
+////////////////////////////////////////////////////////////////////////////
+bool
+SceneManager::initElements(void)
+{
+    ElementObject::Type et = ElementObject::Type::EOT_MINE;
+    for (unsigned int i = 0; i < COUNTER_ELEMENTS_MINES; ++i) {
+        BombElement* bomb = new BombElement();
+        if (!bomb->init()) {
+            debugERROR("Error initializing the bomb element\n");
+            return false;
+        }
+        UPDATE_SIZE(bomb);
+        m_elementObjQueues[et].push(bomb);
     }
 
     return true;
@@ -118,6 +149,25 @@ SceneManager::updateEnemies(float timeFrame)
 
 ////////////////////////////////////////////////////////////////////////////
 void
+SceneManager::updateElements(float timeFrame)
+{
+    for (unsigned int i = 0; i < m_elementObjs.size(); ++i) {
+        ElementObject* element = m_elementObjs[i];
+        if (!element->update(timeFrame)) {
+            // we need to remove this
+            common::Helper::remAndSwapIfExists(element, m_elementObjs);
+            --i;
+
+            // put it again in the correct queue
+            ASSERT(element->elementType() < ElementObject::Type::EOT_COUNT);
+            m_elementObjQueues[element->elementType()].push(element);
+            removeSceneObject(element);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+void
 SceneManager::updateExternals(float timeFrame)
 {
     for (unsigned int i = 0; i < m_externals.size(); ++i) {
@@ -130,14 +180,65 @@ SceneManager::updateExternals(float timeFrame)
     }
 }
 
+////////////////////////////////////////////////////////////////////////////
+void
+SceneManager::performCollisions(void)
+{
+    // since we have everything hardcoded in this ugly shit design we will
+    // go in deep with the shit here
+    // we want to detect:
+    // 1) Player against all enemies.
+    // 2) Player against all elements
+    // 3) Elements against all enemies.
+
+    ASSERT(m_player != 0);
+    if (m_player->areCollisionsEnabled()) {
+        // 1)
+        for (unsigned int i = 0; i < m_enemies.size(); ++i) {
+            ASSERT(m_enemies[i] != 0);
+            EnemyUnit* enemy = m_enemies[i];
+            if (enemy->areCollisionsEnabled() &&
+                m_player->collide(*enemy)) {
+                // we need to substract life or points or do something.
+                m_player->enemyHit(enemy);
+                break;
+            }
+        }
+
+        // 2)
+        for (unsigned int i = 0; i < m_elementObjs.size(); ++i) {
+            ElementObject* element = m_elementObjs[i];
+            ASSERT(element != 0);
+
+            if (element->areCollisionsEnabled() &&
+                m_player->collide(*element)) {
+                // let the element know about it
+                element->objectIntersect(true, m_player);
+            }
+
+            // 3)
+            if (element->areCollisionsEnabled()) {
+                for (unsigned int j = 0; j < m_enemies.size(); ++j) {
+                    EnemyUnit* enemy = m_enemies[j];
+                    ASSERT(enemy != 0);
+                    if (enemy->areCollisionsEnabled() &&
+                        enemy->collide(*element)) {
+                        element->objectIntersect(false, enemy);
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 SceneManager::SceneManager() :
     m_renderTarget(0)
+,   m_player(0)
 {
-    // TODO Auto-generated constructor stub
-
+    ElementObject::setSceneManager(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -147,6 +248,33 @@ SceneManager::~SceneManager()
     stopAllEffects();
     for (int i = 0; i < Effect::EffectType::ET_MAX; ++i) {
         EffectQueue& q = m_effectQueues[i];
+        while (!q.empty()) {
+            delete q.front();
+            q.pop();
+        }
+    }
+
+    // destroy enemies
+    for (unsigned int i = 0; i < m_enemies.size(); ++i) {
+            EnemyUnit* enemy = m_enemies[i];
+            m_enemiesQueues[enemy->enemyType()].push(enemy);
+    }
+    m_enemies.clear();
+    for (int i = 0; i < EnemyUnit::EnemyType::COUNT; ++i) {
+        EnemyQueue& q = m_enemiesQueues[i];
+        while (!q.empty()) {
+            delete q.front();
+            q.pop();
+        }
+    }
+
+    // delete the elements
+    for (unsigned int i = 0; i < m_elementObjs.size(); ++i) {
+        ElementObject* element = m_elementObjs[i];
+        m_elementObjQueues[element->elementType()].push(element);
+    }
+    for (int i = 0; i < ElementObject::Type::EOT_COUNT; ++i) {
+        ElementsObjtQueue& q = m_elementObjQueues[i];
         while (!q.empty()) {
             delete q.front();
             q.pop();
@@ -178,6 +306,11 @@ SceneManager::init(const InitData& data)
 
     if (!initEnemies()) {
         debugERROR("Error initializing the enemies\n");
+        return false;
+    }
+
+    if (!initElements()) {
+        debugERROR("Error initializing the elements\n");
         return false;
     }
 
@@ -277,6 +410,38 @@ SceneManager::createEnemy(EnemyUnit::EnemyType enemyType)
 
     // add it to the scene object
     addSceneObject(enemy);
+
+    return enemy;
+}
+
+////////////////////////////////////////////////////////////////////////////
+const ElementObject*
+SceneManager::createElement(ElementObject::Type type, const sf::Vector2f& position)
+{
+    ASSERT(type < ElementObject::Type::EOT_COUNT);
+
+    // we will try to create an element if we have
+    ElementsObjtQueue& queue = m_elementObjQueues[type];
+    if (queue.empty()) {
+        debugWARNING("We don't have an element to create it\n");
+        return 0;
+    }
+
+    ElementObject* element = queue.front();
+    queue.pop();
+    ASSERT(element != 0);
+
+    // add it to the element active vector and configure it
+    BombElement* bomb = static_cast<BombElement*>(element);
+    // set random position
+    bomb->configure(position);
+
+    m_elementObjs.push_back(bomb);
+
+    // add it to the scene object
+    addSceneObject(bomb);
+
+    return bomb;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -293,6 +458,10 @@ SceneManager::update(float timeFrame)
     updateEffects(timeFrame);
     updateExternals(timeFrame);
     updateEnemies(timeFrame);
+    updateElements(timeFrame);
+
+    // perform collisions
+    performCollisions();
 
     // now we will render them but before that we need to update also the
     // position / size of the object from scene coordinates to screen ones

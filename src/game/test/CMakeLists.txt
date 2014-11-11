@@ -12,7 +12,7 @@ endif()
 # (you can also set it on the command line: -D CMAKE_BUILD_TYPE=Release)
 
 # flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -DDEBUG" )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -DDEBUG -Wall ")
 
 ################################################################################
 # includes dirs
@@ -31,6 +31,8 @@ set(HDRS
     ${DEV_ROOT_PATH}/game/enemies/EnemyUnit.h
     ${DEV_ROOT_PATH}/game/enemies/FishEnemyUnit.h
     ${DEV_ROOT_PATH}/game/resources/ResourceManager.h
+    ${DEV_ROOT_PATH}/game/elements/ElementObject.h
+    ${DEV_ROOT_PATH}/game/elements/BombElement.h
 )
     
 # sources
@@ -45,6 +47,8 @@ set(SRCS
     ${DEV_ROOT_PATH}/game/enemies/EnemyUnit.cpp
     ${DEV_ROOT_PATH}/game/enemies/FishEnemyUnit.cpp
     ${DEV_ROOT_PATH}/game/resources/ResourceManager.cpp
+    ${DEV_ROOT_PATH}/game/elements/ElementObject.cpp
+    ${DEV_ROOT_PATH}/game/elements/BombElement.cpp
 )
 
 

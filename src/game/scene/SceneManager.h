@@ -17,6 +17,8 @@
 #include <common/debug/DebugUtil.h>
 #include <game/effects/Effect.h>
 #include <game/enemies/EnemyUnit.h>
+#include <game/elements/ElementObject.h>
+#include <game/player/Submarine.h>
 
 #include "SceneObject.h"
 
@@ -60,6 +62,12 @@ public:
     void
     removeExternalSceneObject(SceneObject* so);
 
+    // @brief Set the Player object (this will not add the player as external
+    //        only used for collisions)
+    //
+    inline void
+    setPlayer(Submarine* submarine);
+
     ////////////////////////////////////////////////////////////////////////////
     // Effect API
 
@@ -97,6 +105,20 @@ public:
     createEnemy(EnemyUnit::EnemyType enemyType);
 
     ////////////////////////////////////////////////////////////////////////////
+    // Elements API
+
+    // @brief Insert an element in an specific position
+    // @param type      The element type to be created
+    // @param position  The position to put the element
+    // @return the associated element | 0 on error
+    //
+    const ElementObject*
+    createElement(ElementObject::Type type, const sf::Vector2f& position);
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////
 
     // @brief Main update method to update all the logic of the scene.
     //
@@ -115,6 +137,11 @@ private:
     bool
     initEnemies(void);
 
+    // @brief Init the elements of the game
+    //
+    bool
+    initElements(void);
+
     // @brief Update all the effects and effect logic we have.
     //
     void
@@ -125,10 +152,23 @@ private:
     void
     updateEnemies(float timeFrame);
 
+    // @brief Update the elements of the game
+    //
+    void
+    updateElements(float timeFrame);
+
     // @brief Update the external scene objects
     //
     void
     updateExternals(float timeFrame);
+
+    // @brief This method will perform all the collisions detection and logic
+    //        for the different objects.
+    //        REALLY NASTY SHIIIIIIIIIIITTTTTTTTTTTTTTTTT this design
+    //        should be burn and destroyed completely!!!!!!!!!!!!!!!!!
+    //
+    void
+    performCollisions(void);
 
     // @brief Coordinates transformation method, from scene coordinates to
     //        screen coordinates
@@ -155,7 +195,11 @@ private:
     typedef std::vector<SceneObject*> SceneObjectsVec;
     typedef std::queue<EnemyUnit*> EnemyQueue;
     typedef std::vector<EnemyUnit*> Enemyvec;
+    typedef std::vector<ElementObject*> ElementsObjtVec;
+    typedef std::queue<ElementObject*> ElementsObjtQueue;
 
+
+    Submarine* m_player;
     sf::RenderTarget* m_renderTarget;
     sf::IntRect m_screenSize;
     sf::Vector2f m_sceneToScreenTf;
@@ -166,13 +210,16 @@ private:
     EnemyQueue m_enemiesQueues[EnemyUnit::EnemyType::COUNT];
     Enemyvec m_enemies;
 
-
     // external
     SceneObjectsVec m_externals;
 
     // effects
     std::vector<Effect*> m_activeEffects;
     EffectQueue m_effectQueues[Effect::EffectType::ET_MAX];
+
+    // elements
+    ElementsObjtVec m_elementObjs;
+    ElementsObjtQueue m_elementObjQueues[ElementObject::Type::EOT_COUNT];
 };
 
 
@@ -215,6 +262,12 @@ SceneManager::removeSceneObject(SceneObject* so)
 {
     ASSERT(so != 0);
     common::Helper::remAndSwapIfExists(so, m_sceneObjs);
+}
+
+inline void
+SceneManager::setPlayer(Submarine* submarine)
+{
+    m_player = submarine;
 }
 
 } /* namespace game */

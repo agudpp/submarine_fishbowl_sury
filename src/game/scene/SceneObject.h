@@ -101,6 +101,11 @@ public:
     inline bool
     areCollisionsEnabled(void) const;
 
+    // @brief Check collisions between two SceneObjects
+    //
+    inline bool
+    collide(const SceneObject& o) const;
+
 
     // @brief main update method that will be called each frame until we
     //        return false.
@@ -214,6 +219,11 @@ inline bool
 SceneObject::areCollisionsEnabled(void) const
 {
     return m_collEnabled;
+}
+inline bool
+SceneObject::collide(const SceneObject& o) const
+{
+    return m_shape.getGlobalBounds().intersects(o.shape().getGlobalBounds());
 }
 
 } /* namespace game */

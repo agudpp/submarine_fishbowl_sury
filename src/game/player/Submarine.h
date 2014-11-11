@@ -11,6 +11,10 @@
 #include <game/scene/SceneObject.h>
 
 namespace game {
+class EnemyUnit;
+}
+
+namespace game {
 
 class Submarine : public SceneObject
 {
@@ -28,6 +32,10 @@ public:
     inline bool
     isDebugBBVisible(void) const;
 
+    // @brief Method called when an enemy hit the player
+    //
+    void
+    enemyHit(EnemyUnit* enemy);
 
     // @brief main update method that will be called each frame until we
     //        return false.
@@ -37,6 +45,8 @@ public:
 
 
 private:
+    float m_beingHitTime;
+    sf::Vector2f m_lastSize;
 };
 
 

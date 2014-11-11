@@ -105,14 +105,18 @@ FishEnemyUnit::update(float timeFrame)
     // check if we are dying
     if (m_state == State::DYING) {
         // nothing to do, just wait
+        if (currentAnimEnded()) {
+            m_state = State::DEAD;
+        }
         return true;
     }
 
     // if not check if we just die?
     if (life() <= 0) {
+        debug("Dying\n");
         m_state = State::DYING;
-        m_animHandler.changeAnimation(FEU_ANIM_DIE);
-        m_animHandler.setAnimLoop(false);
+        changeAnimation(FEU_ANIM_DIE);
+        setAnimLoop(false);
         // disable collisions since we don't want to check this events anymore
         setCollisionsEnable(false);
         return true;

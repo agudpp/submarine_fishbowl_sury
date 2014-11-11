@@ -49,6 +49,10 @@ public:
     bool
     config(const sf::Vector2f& position, const SceneObject* attach = 0);
 
+    // @brief Return if we are still active or not
+    //
+    inline bool
+    isEffectActive(void) const;
 
     // @brief main update method that will be called each frame until we
     //        return false.
@@ -82,6 +86,12 @@ inline void
 Effect::setEffectType(EffectType t)
 {
     m_effectType = t;
+}
+
+inline bool
+Effect::isEffectActive(void) const
+{
+    return currentAnimEnded();
 }
 
 } /* namespace game */
