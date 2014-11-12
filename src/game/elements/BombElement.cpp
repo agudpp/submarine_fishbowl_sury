@@ -87,6 +87,7 @@ BombElement::objectIntersect(bool isPlayer, SceneObject* sceneObject)
         if (!isPlayer) {
             return;
         }
+        debug("Bomb hit against player. CurrentState Active\n");
         m_player = sceneObject;
         // else we create the effect to follow the player and hide this bomb
         m_counterEffect =
@@ -96,6 +97,7 @@ BombElement::objectIntersect(bool isPlayer, SceneObject* sceneObject)
         m_state = InternalState::COUNTING;
         setVisible(false);
         setCollisionsEnable(false);
+        debug("Changing state to counting\n");
     }
         break;
     case InternalState::COUNTING:
@@ -109,6 +111,7 @@ BombElement::objectIntersect(bool isPlayer, SceneObject* sceneObject)
             // nothing to do
             return;
         }
+        debug("Bomb hit against enemy. CurrentState READY_TO_EXPLODE\n");
         // if is an enemy then we kill the enemy
         EnemyUnit* enemy = static_cast<EnemyUnit*>(sceneObject);
         enemy->setLife(-1);
@@ -118,6 +121,7 @@ BombElement::objectIntersect(bool isPlayer, SceneObject* sceneObject)
                                 position(),
                                 0);
 
+        debug("Explosion effect created, changing to EXPLODING\n");
         m_state = InternalState::EXPLODING;
         setCollisionsEnable(false);
         setVisible(false);
@@ -128,6 +132,7 @@ BombElement::objectIntersect(bool isPlayer, SceneObject* sceneObject)
         // nothing to do
         setVisible(false);
         setCollisionsEnable(false);
+        debug("Hit against something and we are hiding ourselfs. Current: EXPLODING\n");
         return;
         break;
     }
@@ -156,12 +161,14 @@ BombElement::update(float timeFrame)
     if (m_state == InternalState::COUNTING) {
         // we need to check that the effect has returned
         if (m_counterEffect == 0 || !m_counterEffect->isEffectActive()) {
+            debug("Counting effect endend: %d\n", !m_counterEffect->isEffectActive());
             // we need to show the bomb again and start move
             m_state = InternalState::READY_TO_EXPLODE;
             setVisible(true);
             setCollisionsEnable(true);
             configureMover();
             setPosition(m_mover.begin());
+            debug("Changing state to READY_TO_EXPLODE: %d\n");
             return true;
         } else {
             // need to wait

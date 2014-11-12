@@ -158,6 +158,13 @@ AnimHandler::restartAnimation(void)
 {
     m_currentTime = 0.f;
     m_currentFrameIndex = 0;
+    if (m_currentAnim != 0 &&
+        !m_currentAnim->frames().empty()) {
+        // calculate center to set the origin
+        const sf::IntRect& r = m_currentAnim->frames()[0];
+        m_shape->setOrigin(float(r.width) / 2.f, float(r.height) / 2.f);
+        m_shape->setTextureRect(r);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +185,7 @@ AnimHandler::update(float timeFrame)
             while (m_currentTime >= animTime) m_currentTime -= animTime;
         } else {
             // need to let the user know that the anim already end?
+            m_currentTime = animTime;
             return;
         }
     }

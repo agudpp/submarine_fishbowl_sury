@@ -72,8 +72,15 @@ main(int argc, char** args)
                                          sf::Vector2f(0, 0),
                                          explosion);
                                          */
-                } else if (event.key.code == sf::Keyboard::Right) {
-
+                } else if (event.key.code == sf::Keyboard::Num3) {
+                    const float xrnd = static_cast<float>(std::rand() % 999)
+                        / 999.f;
+                    const float yrnd = static_cast<float>(std::rand() % 999)
+                        / 999.f;
+                    sceneMngr.playEffect(game::Effect::EffectType::ET_3SEC_COUNTER,
+                                         sf::Vector2f(xrnd, yrnd),
+                                         0);
+                    debug("Creating effect\n");
                 } else if (event.key.code == sf::Keyboard::Num1) {
                     fish = (game::FishEnemyUnit*) sceneMngr.createEnemy(game::EnemyUnit::EnemyType::FISH);
                 } else if (event.key.code == sf::Keyboard::D) {

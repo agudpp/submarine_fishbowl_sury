@@ -61,7 +61,7 @@ Effect::update(float timeFrame)
     // what we have to do is basically update the animation until we finish
     // and then we just end the effect
     m_animHandler.update(timeFrame);
-    return m_animHandler.currentAnimEnded();
+    return !m_animHandler.currentAnimEnded();
 }
 
 

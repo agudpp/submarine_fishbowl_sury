@@ -81,6 +81,11 @@ public:
     inline bool
     currentAnimEnded(void) const;
 
+    // @brief Return the current accum anim time (offset time of the current anim)
+    //
+    inline float
+    currentAnimTime(void) const;
+
     // @brief Current animation | 0 if no anim
     //
     inline const Animation*
@@ -137,9 +142,14 @@ AnimHandler::setAnimLoop(bool loop)
 inline bool
 AnimHandler::currentAnimEnded(void) const
 {
-    return m_currentAnim != 0 &&
-           m_currentAnim->time() >= m_currentTime &&
-           !m_loopAnim;
+    return (m_currentAnim == 0) ||
+           (m_currentTime >= m_currentAnim->time() &&
+           !m_loopAnim);
+}
+inline float
+AnimHandler::currentAnimTime(void) const
+{
+    m_currentTime;
 }
 
 inline const Animation*

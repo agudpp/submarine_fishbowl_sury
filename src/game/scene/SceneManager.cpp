@@ -460,9 +460,6 @@ SceneManager::update(float timeFrame)
     updateEnemies(timeFrame);
     updateElements(timeFrame);
 
-    // perform collisions
-    performCollisions();
-
     // now we will render them but before that we need to update also the
     // position / size of the object from scene coordinates to screen ones
     for (unsigned int i = 0; i < m_sceneObjs.size(); ++i) {
@@ -475,6 +472,7 @@ SceneManager::update(float timeFrame)
 
         const sf::Vector2f screenSize = sceneToScreenPos(so->sceneSize());
         shape.setSize(screenSize);
+        shape.setOrigin(screenSize * 0.5f);
 
         // put this element also in the associated render queue
         ASSERT(so->renderLayer() < SceneObject::RenderLayer::RL_COUNT);
@@ -482,6 +480,10 @@ SceneManager::update(float timeFrame)
             m_renderQueues[so->renderLayer()].push_back(so);
         }
     }
+
+
+    // perform collisions after updating the positions
+    performCollisions();
 
     // now we will render the objects in the correct layers.
     // clear the render target before

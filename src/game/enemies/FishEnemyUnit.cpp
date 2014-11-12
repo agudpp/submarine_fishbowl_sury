@@ -100,8 +100,6 @@ FishEnemyUnit::update(float timeFrame)
 
     // update the animation
     m_animHandler.update(timeFrame);
-    m_mover.update(timeFrame);
-
     // check if we are dying
     if (m_state == State::DYING) {
         // nothing to do, just wait
@@ -121,6 +119,9 @@ FishEnemyUnit::update(float timeFrame)
         setCollisionsEnable(false);
         return true;
     }
+
+    // if not dying update the position
+    m_mover.update(timeFrame);
 
     // check if we arrive the destination point and stop updating this
     if (m_mover.arrivedDestination()) {

@@ -91,7 +91,7 @@ Effect::setEffectType(EffectType t)
 inline bool
 Effect::isEffectActive(void) const
 {
-    return currentAnimEnded();
+    return !currentAnimEnded();
 }
 
 } /* namespace game */
