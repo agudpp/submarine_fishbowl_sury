@@ -10,6 +10,9 @@
 
 
 #include <string>
+#include <vector>
+
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <img_reader/ImgCapturedData.h>
 #include <common/math/Vector2.h>
@@ -33,7 +36,9 @@ public:
     // Init data
     //
     struct InitData {
-        std::string configFilePath;
+        // data used for the contours algorithm
+        double maxValue;
+        double threshold;
     };
 
     // The resulting data obtaindes by this class.
@@ -46,9 +51,10 @@ public:
         // submarine info
         Vec2I submPos;  // the center position of the bounding box
         Vec2I submSize; // the size of the bounding box (width / height)
+
         // float submRotation; // probably we can track rotation, not for now
 
-        // fishbowl info (4 corners)
+        // fishbowl info (4 corners) (note used)
         Vec2I topLeft;
         Vec2I topRight;
         Vec2I bottomLeft;
@@ -74,6 +80,18 @@ public:
     void
     uninit(void);
 
+    // @brief Methods used to start the configuration process if needed for this
+    //        algorithm
+    //        The updateconfigFrame will return true until the user finish the
+    //        configuration
+    //
+    void
+    startConfiguration(void);
+    bool
+    updateConfigFrame(cv::Mat& frame);
+    void
+    finishConfiguration(void);
+
     // @brief This is the main method that should process (analyze) the image
     //        and extract the information we need from the frame.
     //        For this particular project we will only extract the bounding box
@@ -85,6 +103,28 @@ public:
     //
     bool
     process(ImgCapturedData& capturedData, ResultData& result);
+
+
+private:
+
+    // @brief Method that will process a frame and retrieve all the contours
+    //        and put them into the cache structures
+    //
+    bool
+    retrieveContours(cv::Mat& capturedData);
+
+private:
+    double m_maxValue;
+    int m_threshold;
+    cv::Mat m_cacheFrame;
+
+    // cached vecs
+    std::vector<std::vector<cv::Point> > m_contours;
+    std::vector<cv::Vec4i> m_cHierarchy;
+    std::vector<std::vector<cv::Point> > m_contoursPoly;
+    std::vector<cv::Rect> m_boundRect;
+    std::vector<cv::Point2f> m_center;
+    std::vector<float> m_radius;
 
 };
 

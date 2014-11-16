@@ -17,74 +17,90 @@
 class Timestamp
 {
 public:
-    typedef std::pair<double, std::string> TimestampEntry;
-
-    static double
-    getNowTimeStamp(void)
-    {
-        struct timeval now;
-        if (gettimeofday(&now, 0) < 0)
-            return 0.0;
-
-        return static_cast<double>(now.tv_sec
-            + (static_cast<double>(now.tv_usec) / 1000000.0));
-    }
-
-public:
     // Creates the timestamp now
-    Timestamp()
-    {
-        struct timeval now;
-        gettimeofday(&now, 0);
-        mTimestamp = static_cast<double>(now.tv_sec
-            + (static_cast<double>(now.tv_usec) / 1000000.0));
-    }
+    inline Timestamp(void);
 
-    double
-    getFirstTimestamp(void) const
-    {
-        return mTimestamp;
-    }
+    // @brief Return the current time from the system in seconds
+    //
+    static double
+    getNowTimeStamp(void);
 
-    // Returns the difference from the first timestamp and now
-    double
-    getDiffTimestamp(void) const
-    {
-        struct timeval now;
+    // @brief Reset the timestamp to take the current time.
+    //
+    inline void
+    reset(void);
 
-        if (gettimeofday(&now, 0) < 0)
-            return 0.0;
+    // @brief Return the current timestamp in seconds
+    //
+    inline double
+    getTimestamp(void) const;
 
-        double nowDouble = static_cast<double>(now.tv_sec
-            + (static_cast<double>(now.tv_usec) / 1000000.0));
-
-        double first = getFirstTimestamp();
-
-        return nowDouble - first;
-    }
-
-    // Returns the timetamp entries
-    const std::list<TimestampEntry> &
-    getEntries(void) const
-    {
-        return mEntries;
-    }
-
-    // Add a new Timestamp
-    void
-    addTimestamp(const std::string &info)
-    {
-        TimestampEntry entry;
-
-        entry.first = Timestamp::getNowTimeStamp();
-        entry.second = info;
-
-        mEntries.push_back(entry);
-    }
+    // Returns the difference from the first timestamp and now in seconds
+    //
+    inline double
+    getDiffTimestamp(void) const;
 
 private:
     double mTimestamp;
-    std::list<TimestampEntry> mEntries;
 };
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Inline stuff
+
+
+// Creates the timestamp now
+inline Timestamp::Timestamp(void)
+{
+    reset();
+}
+
+inline double
+Timestamp::getNowTimeStamp(void)
+{
+    struct timeval now;
+    if (gettimeofday(&now, 0) < 0)
+        return 0.0;
+
+    return static_cast<double>(now.tv_sec
+        + (static_cast<double>(now.tv_usec) / 1000000.0));
+}
+
+inline void
+Timestamp::reset(void)
+{
+    struct timeval now;
+    gettimeofday(&now, 0);
+    mTimestamp = static_cast<double>(now.tv_sec
+        + (static_cast<double>(now.tv_usec) / 1000000.0));
+}
+
+inline double
+Timestamp::getTimestamp(void) const
+{
+    return mTimestamp;
+}
+
+// Returns the difference from the first timestamp and now
+inline double
+Timestamp::getDiffTimestamp(void) const
+{
+    struct timeval now;
+
+    if (gettimeofday(&now, 0) < 0)
+        return 0.0;
+
+    const double nowDouble = static_cast<double>(now.tv_sec
+        + (static_cast<double>(now.tv_usec) / 1000000.0));
+
+    const double first = getTimestamp();
+
+    return nowDouble - first;
+}
+
+
 
 #endif /* TIMESTAMP_H_ */
