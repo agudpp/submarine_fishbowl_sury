@@ -95,6 +95,19 @@ callBackFunc(int event, int x, int y, int flags, void* userdata)
     data->points[(data->numPoints)++] = cv::Point(x,y);
 }
 
+// @brief Callback to detect only when the user clicks the mouse (set the
+//        flag to true)
+//
+void
+mouseClickDetectCallBackFunc(int event, int x, int y, int flags, void* userdata)
+{
+    // if it is not left do nothing
+    if (event != cv::EVENT_LBUTTONDOWN) {
+        return;
+    }
+    bool* clicked = static_cast<bool*>(userdata);
+    *clicked = true;
+}
 
 // @brief Helper method to draw the points / lines into the frame
 //
@@ -193,6 +206,37 @@ Configurer::configureRect(const cv::Mat& img)
         cv::waitKey(0);
     }
     return exitStatus;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+bool
+Configurer::selectBaseImage(const cv::Mat& img)
+{
+    bool userClicked = false;
+    cv::namedWindow("Select base background image", cv::WINDOW_AUTOSIZE);
+    cv::setMouseCallback("Select base background image", mouseClickDetectCallBackFunc, &userClicked);
+
+    // paint the rectangles
+    static const cv::Scalar_<int> color(0, 0, 255, 0);
+    static const int lineThickness = 1;
+
+    const cv::Rect rectArea = minimumSelRect();
+    cv::Mat result = img.clone();
+    cv::rectangle(result, rectArea, color, lineThickness);
+
+    cv::imshow("Select base background image", result);
+
+    while (!userClicked) {
+        // check user input
+        const int keyPressed = cv::waitKey(30);
+        if (keyPressed == 27) {
+            break;
+        }
+    }
+
+    cv::destroyWindow("Select Rectangle Game Area");
+
+    return userClicked;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

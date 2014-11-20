@@ -76,7 +76,7 @@ real_main(int argc, char** argv)
 
     // open the device
     img::ImageReader::InitData initData;
-    initData.filePath = "./media/sample_good_cut.wmv";
+    initData.filePath = "./media/referencia.wmv";
     if (!imgReader.init(initData)) {
         debugERROR("Cannot init, abort\n");
         return -1;
@@ -99,10 +99,23 @@ real_main(int argc, char** argv)
               configurer.bottomLeft().x, configurer.bottomLeft().y,
               configurer.bottomRight().x, configurer.bottomRight().y);
 
-    // now we need to configure the analyzer and while we capture frames
+    // now we need to select the base image
+    bool baseSelected = false;
+    while (imgReader.captureFrame(frameData) && !baseSelected) {
+        baseSelected = configurer.selectBaseImage(frameData.frame);
+    }
+
+    if (!baseSelected) {
+        debugERROR("We wasn't able to select a base image before reading all the frames?\n");
+        return -1;
+    }
+
+    // now in frame data we have the base frame we will use to compare
+    // configure the analyzer and while we capture frames
     img::ImageAnalyzer::InitData iaInitData;
     iaInitData.maxValue = 255;
     iaInitData.threshold = 80;
+    iaInitData.baseImage = frameData.frame(configurer.minimumSelRect());
     if (!analyzer.init(iaInitData)) {
         debugERROR("Error initializing the analyzer\n");
         return -3;
@@ -110,7 +123,17 @@ real_main(int argc, char** argv)
 
     // configure it
     analyzer.startConfiguration();
+
+#ifdef DEBUG
+    // debug window showing  the captured frame
+    cv::namedWindow("DEBUG_LAST_FRAME", cv::WINDOW_AUTOSIZE);
+#endif
     while (imgReader.captureFrame(frameData)) {
+#ifdef DEBUG
+        // debug
+        cv::imshow("DEBUG_LAST_FRAME", frameData.frame);
+#endif
+
         // here we need to only use a certain rectangle of the image
         frameData.frame = frameData.frame(configurer.minimumSelRect());
 

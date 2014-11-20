@@ -39,6 +39,9 @@ public:
         // data used for the contours algorithm
         double maxValue;
         double threshold;
+
+        // the base image to be used when comparing with the current frame
+        cv::Mat baseImage;
     };
 
     // The resulting data obtaindes by this class.
@@ -107,16 +110,30 @@ public:
 
 private:
 
+    // @brief Apply the difference against the base image and save the result
+    //        into the m_cache image. Assumes the cache image contains the
+    //        image we want to compare already
+    //
+    bool
+    diffFilterWithBase(void);
+
     // @brief Method that will process a frame and retrieve all the contours
     //        and put them into the cache structures
     //
     bool
     retrieveContours(cv::Mat& capturedData);
 
+    // @brief testing method
+    bool
+    testMethod(cv::Mat& capturedData);
+
 private:
     double m_maxValue;
     int m_threshold;
+    int m_diffThreshold;
     cv::Mat m_cacheFrame;
+    cv::Mat m_prevCacheFrame;
+    cv::Mat m_baseImage;
 
     // cached vecs
     std::vector<std::vector<cv::Point> > m_contours;

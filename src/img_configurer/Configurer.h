@@ -37,6 +37,16 @@ public:
     bool
     configureRect(const cv::Mat& img);
 
+    // @brief Select the background base image to be used to compare (diff)
+    //        with the others.
+    // @param frame         The image to show the user if we want to use as default
+    // @return true if the user select the current frame as base image
+    //         false if we need to call again this method because the user discard
+    //         the img
+    //
+    bool
+    selectBaseImage(const cv::Mat& img);
+
     // @brief Return the four points selected by the user.
     //
     inline const cv::Point&
