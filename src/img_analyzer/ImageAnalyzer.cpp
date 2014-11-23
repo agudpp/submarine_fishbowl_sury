@@ -11,14 +11,11 @@
 
 #include <common/debug/DebugUtil.h>
 
-
 namespace {
 cv::RNG g_rng(12345);
 }
 
-
 namespace img {
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool
@@ -49,12 +46,17 @@ ImageAnalyzer::diffFilterWithBase(void)
             for (int j = 0; j < nCols; ++j) {
                 // check the difference
                 const int diff = std::abs(int(pc[j]) - int(pp[j]));
-                if (diff < m_diffThreshold) {
+                if (diff > m_diffThreshold) {
                     // reset to color 0
                     pc[j] = 0;
+                    //debugRED("DIFFER %d, %d\n", i, j);
+                } else {
+                    //debugGREEN("no change for %d, %d\n", i, j);
                 }
             }
         }
+    } else {
+        debugWARNING("diff size\n");
     }
 
     return true;
@@ -95,10 +97,12 @@ ImageAnalyzer::retrieveContours(cv::Mat& capturedData)
         }
     }
 
-
-
-    cv::blur(m_cacheFrame, m_cacheFrame, cv::Size(3,3));
-    cv::threshold(m_cacheFrame, m_cacheFrame, m_threshold, m_maxValue, cv::THRESH_BINARY);
+    cv::blur(m_cacheFrame, m_cacheFrame, cv::Size(3, 3));
+    cv::threshold(m_cacheFrame,
+                  m_cacheFrame,
+                  m_threshold,
+                  m_maxValue,
+                  cv::THRESH_BINARY);
 
     // now we will get the contours
     m_contours.clear();
@@ -119,9 +123,10 @@ ImageAnalyzer::retrieveContours(cv::Mat& capturedData)
     for (unsigned int i = 0; i < m_contours.size(); ++i) {
         cv::approxPolyDP(cv::Mat(m_contours[i]), m_contoursPoly[i], 3.0, true);
         m_boundRect[i] = cv::boundingRect(cv::Mat(m_contoursPoly[i]));
-        cv::minEnclosingCircle((cv::Mat) m_contoursPoly[i], m_center[i], m_radius[i]);
+        cv::minEnclosingCircle((cv::Mat) m_contoursPoly[i],
+                               m_center[i],
+                               m_radius[i]);
     }
-
 
     return true;
 }
@@ -136,10 +141,13 @@ ImageAnalyzer::testMethod(cv::Mat& capturedData)
     diffFilterWithBase();
 
     //cv::blur(m_cacheFrame, m_cacheFrame, cv::Size(3,3));
-    cv::GaussianBlur(m_cacheFrame, m_cacheFrame, cv::Size(7,7), 1.5, 1.5);
-    cv::threshold(m_cacheFrame, m_cacheFrame, m_threshold, m_maxValue, cv::THRESH_BINARY);
+    //cv::GaussianBlur(m_cacheFrame, m_cacheFrame, cv::Size(7,7), 1.5, 1.5);
+//    cv::threshold(m_cacheFrame,
+//                  m_cacheFrame,
+//                  m_threshold,
+//                  m_maxValue,
+//                  cv::THRESH_BINARY);
     //cv::Canny(m_cacheFrame, m_cacheFrame, m_threshold, m_diffThreshold, 3, 1.0);
-
 
     return true;
 }
@@ -171,7 +179,6 @@ ImageAnalyzer::init(const InitData& initData)
     return true;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void
 ImageAnalyzer::uninit(void)
@@ -186,7 +193,10 @@ ImageAnalyzer::startConfiguration(void)
     // create the window
     cv::namedWindow("ConfigAnalyzer", cv::WINDOW_AUTOSIZE);
     cv::createTrackbar("Threshold", "ConfigAnalyzer", &m_threshold, 255);
-    cv::createTrackbar("Diff Threshold", "ConfigAnalyzer", &m_diffThreshold, 255);
+    cv::createTrackbar("Diff Threshold",
+                       "ConfigAnalyzer",
+                       &m_diffThreshold,
+                       255);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,44 +205,43 @@ ImageAnalyzer::updateConfigFrame(cv::Mat& frame)
 {
     // here we need to process the frame to get the contours
     /*if (!retrieveContours(frame)) {
-        debugERROR("Couldn't get the contours!\n");
-        return false;
-    }
+     debugERROR("Couldn't get the contours!\n");
+     return false;
+     }
 
-    // paint the  frame
-    cv::Mat drawing = cv::Mat::zeros(m_cacheFrame.size(), CV_8UC3);
-    for (int i = 0; i < m_contours.size(); i++) {
-        cv::Scalar color = cv::Scalar(g_rng.uniform(0, 255),
-                                      g_rng.uniform(0, 255),
-                                      g_rng.uniform(0, 255));
-        cv::drawContours(drawing,
-                         m_contoursPoly,
-                         i,
-                         color,
-                         1,
-                         8,
-                         std::vector<cv::Vec4i>(),
-                         0,
-                         cv::Point());
-        cv::rectangle(drawing,
-                      m_boundRect[i].tl(),
-                      m_boundRect[i].br(),
-                      color,
-                      2,
-                      8,
-                      0);
-        cv::circle(drawing, m_center[i], (int) m_radius[i], color, 2, 8, 0);
-    }
-    cv::imshow("ConfigAnalyzer", drawing);
-    */
+     // paint the  frame
+     cv::Mat drawing = cv::Mat::zeros(m_cacheFrame.size(), CV_8UC3);
+     for (int i = 0; i < m_contours.size(); i++) {
+     cv::Scalar color = cv::Scalar(g_rng.uniform(0, 255),
+     g_rng.uniform(0, 255),
+     g_rng.uniform(0, 255));
+     cv::drawContours(drawing,
+     m_contoursPoly,
+     i,
+     color,
+     1,
+     8,
+     std::vector<cv::Vec4i>(),
+     0,
+     cv::Point());
+     cv::rectangle(drawing,
+     m_boundRect[i].tl(),
+     m_boundRect[i].br(),
+     color,
+     2,
+     8,
+     0);
+     cv::circle(drawing, m_center[i], (int) m_radius[i], color, 2, 8, 0);
+     }
+     cv::imshow("ConfigAnalyzer", drawing);
+     */
 
     // TODO remove this
     testMethod(frame);
     cv::imshow("ConfigAnalyzer", m_cacheFrame);
 
-
     // check if the user press escape to finish the config
-    const int keyPressed = cv::waitKey(100);
+    const int keyPressed = cv::waitKey(600);
     if (keyPressed == 27) {
         return false;
     }
@@ -265,7 +274,5 @@ ImageAnalyzer::process(ImgCapturedData& capturedData, ResultData& result)
     return true;
 
 }
-
-
 
 } /* namespace img */

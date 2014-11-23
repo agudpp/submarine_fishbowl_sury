@@ -76,7 +76,12 @@ real_main(int argc, char** argv)
 
     // open the device
     img::ImageReader::InitData initData;
-    initData.filePath = "./media/referencia.wmv";
+    if (argc > 1) {
+        initData.filePath = argv[1];
+    } else {
+        initData.filePath = "./media/referencia.wmv";
+    }
+
     if (!imgReader.init(initData)) {
         debugERROR("Cannot init, abort\n");
         return -1;
